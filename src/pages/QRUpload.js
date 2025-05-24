@@ -58,53 +58,33 @@ const QRUpload = () => {
     }
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    if (!file) {
-      setError('Please select a file');
-      return;
-    }
-    if (!name.trim()) {
-      setError('Please enter your name');
-      return;
-    }
-    if (!phoneNumber.trim()) {
-      setError('Please enter your phone number');
-      return;
-    }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
 
     try {
-      setUploading(true);
-      setError('');
-      setSuccess('');
-
       const formData = new FormData();
       formData.append('document', file);
-      formData.append('cyber_center_id', centerId);
       formData.append('name', name);
       formData.append('phone_number', phoneNumber);
 
       const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/documents/direct-upload`,
+        `${process.env.REACT_APP_API_URL}/api/documents/direct-upload/${centerId}`,
         formData,
         {
           headers: {
-            'Content-Type': 'multipart/form-data'
-          }
+            'Content-Type': 'multipart/form-data',
+          },
         }
       );
 
-      setSuccess('Document uploaded successfully! You will receive an OTP on your phone.');
-      setFile(null);
-      setName('');
-      setPhoneNumber('');
-      
-      // Reset form
-      event.target.reset();
+      setSuccess(true);
     } catch (error) {
+      console.error('Upload error:', error);
       setError(error.response?.data?.message || 'Failed to upload document');
     } finally {
-      setUploading(false);
+      setLoading(false);
     }
   };
 

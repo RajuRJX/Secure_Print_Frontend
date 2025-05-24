@@ -189,27 +189,26 @@ const CyberCenterDashboard = () => {
                 Your QR Code
               </Typography>
               <Box sx={{ textAlign: 'center', mb: 2 }}>
-              {qrCodeUrl && (
-  <QRCode
-    value={qrCodeUrl}
-    size={200}
-    style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-    viewBox={`0 0 200 200`}
-  />
-)}
-              </Box>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
-                Scan this QR code to upload documents directly to your center
-              </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
-                <Typography variant="body2" sx={{ flex: 1, wordBreak: 'break-all' }}>
-                  {qrCodeUrl}
-                </Typography>
-                <Tooltip title="Copy URL">
-                  <IconButton onClick={copyQRCodeUrl} size="small">
-                    <ContentCopyIcon />
-                  </IconButton>
-                </Tooltip>
+                {qrCodeUrl && (
+                  <>
+                    <QRCode
+                      value={qrCodeUrl}
+                      size={200}
+                      style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                      viewBox={`0 0 200 200`}
+                    />
+                    <Box sx={{ mt: 2 }}>
+                      <Typography variant="body2" color="text.secondary" sx={{ wordBreak: 'break-all' }}>
+                        {qrCodeUrl}
+                      </Typography>
+                      <Tooltip title="Copy URL">
+                        <IconButton onClick={copyQRCodeUrl} size="small">
+                          <ContentCopyIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+                  </>
+                )}
               </Box>
             </CardContent>
           </Card>
