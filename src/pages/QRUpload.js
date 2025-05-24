@@ -28,15 +28,23 @@ const QRUpload = () => {
   const [name, setName] = useState('');
 
   useEffect(() => {
+    if (!centerId) {
+      setError('Invalid center ID');
+      setLoading(false);
+      return;
+    }
     fetchCenterInfo();
   }, [centerId]);
 
   const fetchCenterInfo = async () => {
     try {
+      setLoading(true);
+      setError('');
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/auth/cyber-center-qr/${centerId}`);
       setCenterInfo(response.data);
     } catch (error) {
-      setError('Failed to load cyber center information');
+      console.error('Failed to fetch center info:', error);
+      setError('Failed to load cyber center information. Please check if the center ID is correct.');
     } finally {
       setLoading(false);
     }
@@ -60,8 +68,22 @@ const QRUpload = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError(null);
+    if (!file) {
+      setError('Please select a file');
+      return;
+    }
+    if (!name.trim()) {
+      setError('Please enter your name');
+      return;
+    }
+    if (!phoneNumber.trim()) {
+      setError('Please enter your phone number');
+      return;
+    }
+
+    setUploading(true);
+    setError('');
+    setSuccess('');
 
     try {
       const formData = new FormData();
@@ -79,12 +101,18 @@ const QRUpload = () => {
         }
       );
 
-      setSuccess(true);
+      setSuccess('Document uploaded successfully! You will receive an OTP on your phone.');
+      setFile(null);
+      setName('');
+      setPhoneNumber('');
+      
+      // Reset form
+      e.target.reset();
     } catch (error) {
       console.error('Upload error:', error);
       setError(error.response?.data?.message || 'Failed to upload document');
     } finally {
-      setLoading(false);
+      setUploading(false);
     }
   };
 
@@ -92,6 +120,14 @@ const QRUpload = () => {
     return (
       <Container maxWidth="sm" sx={{ mt: 4, textAlign: 'center' }}>
         <CircularProgress />
+      </Container>
+    );
+  }
+
+  if (error && !centerInfo) {
+    return (
+      <Container maxWidth="sm" sx={{ mt: 4 }}>
+        <Alert severity="error">{error}</Alert>
       </Container>
     );
   }
