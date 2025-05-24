@@ -26,7 +26,7 @@ import {
 } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
-import { QRCodeSVG } from 'qrcode.react';
+import QRCode from 'react-qr-code';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 const CyberCenterDashboard = () => {
@@ -189,14 +189,14 @@ const CyberCenterDashboard = () => {
                 Your QR Code
               </Typography>
               <Box sx={{ textAlign: 'center', mb: 2 }}>
-                {qrCodeUrl && (
-                  <QRCodeSVG
-                    value={qrCodeUrl}
-                    size={200}
-                    level="H"
-                    includeMargin={true}
-                  />
-                )}
+              {qrCodeUrl && (
+  <QRCode
+    value={qrCodeUrl}
+    size={200}
+    style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+    viewBox={`0 0 200 200`}
+  />
+)}
               </Box>
               <Typography variant="body2" color="text.secondary" gutterBottom>
                 Scan this QR code to upload documents directly to your center
