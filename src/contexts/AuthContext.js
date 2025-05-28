@@ -15,6 +15,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(localStorage.getItem('token'));
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     if (token) {
@@ -24,12 +25,14 @@ export const AuthProvider = ({ children }) => {
         .then(response => {
           console.log('Fetched user profile:', response.data);
           setUser(response.data);
+          setIsAuthenticated(true);
         })
         .catch(error => {
           console.error('Error fetching profile:', error);
           localStorage.removeItem('token');
           delete axios.defaults.headers.common['Authorization'];
           setToken(null);
+          setIsAuthenticated(false);
         })
         .finally(() => {
           setLoading(false);
@@ -39,26 +42,31 @@ export const AuthProvider = ({ children }) => {
     }
   }, [token]);
 
-  const login = async (email, password) => {
-    const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/login`, {
-      email,
-      password
-    });
-    const { token: newToken, user: userData } = response.data;
-    localStorage.setItem('token', newToken);
-    setToken(newToken);
-    setUser(userData);
-    return userData;
+  const login = async (credentials) => {
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/login`, credentials);
+      const { token: newToken, user: userData } = response.data;
+      localStorage.setItem('token', newToken);
+      setToken(newToken);
+      setUser(userData);
+      setIsAuthenticated(true);
+      return response.data;
+    } catch (error) {
+      console.error('Login error:', error.response?.data || error.message);
+      throw new Error(error.response?.data?.message || 'Login failed');
+    }
   };
 
-  const register = async (registrationData) => {
-    console.log('Registering user with data:', registrationData);
-    const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/register`, registrationData);
-    const { token: newToken, user: userData } = response.data;
-    localStorage.setItem('token', newToken);
-    setToken(newToken);
-    setUser(userData);
-    return userData;
+  const register = async (userData) => {
+    try {
+      console.log('Registering user with data:', userData);
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/register`, userData);
+      console.log('Registration response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Registration error:', error.response?.data || error.message);
+      throw new Error(error.response?.data?.message || 'Registration failed');
+    }
   };
 
   const logout = () => {
@@ -66,13 +74,14 @@ export const AuthProvider = ({ children }) => {
     delete axios.defaults.headers.common['Authorization'];
     setToken(null);
     setUser(null);
+    setIsAuthenticated(false);
   };
 
   const value = {
     user,
     token,
     loading,
-    isAuthenticated: !!user,
+    isAuthenticated,
     login,
     register,
     logout

@@ -1,21 +1,23 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import {
   Container,
-  Box,
-  Typography,
+  Paper,
   TextField,
   Button,
-  Alert,
+  Typography,
+  Box,
   FormControlLabel,
   Checkbox,
-  Paper
+  Alert
 } from '@mui/material';
-import { useAuth } from '../contexts/AuthContext';
 
-const Register = () => {
+function Register() {
   const navigate = useNavigate();
   const { register } = useAuth();
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -24,10 +26,8 @@ const Register = () => {
     phone_number: '',
     is_cyber_center: false,
     center_name: '',
-    center_address: '',
-    center_phone: ''
+    center_address: ''
   });
-  const [error, setError] = useState('');
 
   const handleChange = (e) => {
     const { name, value, checked } = e.target;
@@ -40,55 +40,50 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
+    setLoading(true);
 
     try {
-      console.log('Submitting registration:', formData);
-      await register({
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
-        phone_number: formData.is_cyber_center ? formData.center_phone : formData.phone_number,
-        is_cyber_center: formData.is_cyber_center,
-        center_name: formData.center_name,
-        center_address: formData.center_address
-      });
-      navigate('/');
+      if (formData.password !== formData.confirmPassword) {
+        throw new Error('Passwords do not match');
+      }
+
+      const { confirmPassword, ...registrationData } = formData;
+      console.log('Submitting registration:', registrationData);
+      
+      await register(registrationData);
+      navigate('/login');
     } catch (err) {
       console.error('Registration error:', err);
-      setError(err.response?.data?.message || 'Registration failed');
+      setError(err.message || 'Failed to register. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <Container maxWidth="sm">
-      <Box sx={{ mt: 4 }}>
-        <Typography variant="h4" align="center" gutterBottom>
-          Register
-        </Typography>
+      <Box sx={{ mt: 8, mb: 4 }}>
+        <Paper elevation={3} sx={{ p: 4 }}>
+          <Typography variant="h4" component="h1" gutterBottom align="center">
+            Register
+          </Typography>
+          
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
 
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
-
-        <Paper sx={{ p: 3 }}>
           <form onSubmit={handleSubmit}>
             <TextField
               fullWidth
-              label="Full Name"
+              label="Name"
               name="name"
               value={formData.name}
               onChange={handleChange}
               margin="normal"
               required
             />
-
             <TextField
               fullWidth
               label="Email"
@@ -99,7 +94,6 @@ const Register = () => {
               margin="normal"
               required
             />
-
             <TextField
               fullWidth
               label="Password"
@@ -110,7 +104,6 @@ const Register = () => {
               margin="normal"
               required
             />
-
             <TextField
               fullWidth
               label="Confirm Password"
@@ -121,7 +114,16 @@ const Register = () => {
               margin="normal"
               required
             />
-
+            <TextField
+              fullWidth
+              label="Phone Number"
+              name="phone_number"
+              value={formData.phone_number}
+              onChange={handleChange}
+              margin="normal"
+              required
+            />
+            
             <FormControlLabel
               control={
                 <Checkbox
@@ -134,7 +136,7 @@ const Register = () => {
               sx={{ mt: 2 }}
             />
 
-            {formData.is_cyber_center ? (
+            {formData.is_cyber_center && (
               <>
                 <TextField
                   fullWidth
@@ -145,7 +147,6 @@ const Register = () => {
                   margin="normal"
                   required
                 />
-
                 <TextField
                   fullWidth
                   label="Center Address"
@@ -154,45 +155,26 @@ const Register = () => {
                   onChange={handleChange}
                   margin="normal"
                   required
-                  multiline
-                  rows={3}
-                />
-
-                <TextField
-                  fullWidth
-                  label="Center Phone Number"
-                  name="center_phone"
-                  value={formData.center_phone}
-                  onChange={handleChange}
-                  margin="normal"
-                  required
                 />
               </>
-            ) : (
-              <TextField
-                fullWidth
-                label="Phone Number"
-                name="phone_number"
-                value={formData.phone_number}
-                onChange={handleChange}
-                margin="normal"
-                required
-              />
             )}
 
             <Button
               type="submit"
-              variant="contained"
               fullWidth
+              variant="contained"
+              color="primary"
+              size="large"
+              disabled={loading}
               sx={{ mt: 3 }}
             >
-              Register
+              {loading ? 'Registering...' : 'Register'}
             </Button>
           </form>
         </Paper>
       </Box>
     </Container>
   );
-};
+}
 
 export default Register; 
