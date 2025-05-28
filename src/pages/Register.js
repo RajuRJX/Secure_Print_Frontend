@@ -50,8 +50,16 @@ function Register() {
       const { confirmPassword, ...registrationData } = formData;
       console.log('Submitting registration:', registrationData);
       
-      await register(registrationData);
-      navigate('/login');
+      const response = await register(registrationData);
+      console.log('Registration successful:', response);
+      
+      // Show success message
+      setError('Registration successful! Redirecting to login...');
+      
+      // Wait a moment before redirecting
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
     } catch (err) {
       console.error('Registration error:', err);
       setError(err.message || 'Failed to register. Please try again.');
