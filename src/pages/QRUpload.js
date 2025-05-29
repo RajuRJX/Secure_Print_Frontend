@@ -26,6 +26,7 @@ const QRUpload = () => {
   const [file, setFile] = useState(null);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
 
   useEffect(() => {
     if (!centerId) {
@@ -80,6 +81,10 @@ const QRUpload = () => {
       setError('Please enter your phone number');
       return;
     }
+    if (!email.trim()) {
+      setError('Please enter your email address');
+      return;
+    }
 
     setUploading(true);
     setError('');
@@ -90,6 +95,7 @@ const QRUpload = () => {
       formData.append('document', file);
       formData.append('name', name);
       formData.append('phone_number', phoneNumber);
+      formData.append('email', email);
 
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/api/documents/direct-upload/${centerId}`,
@@ -101,10 +107,11 @@ const QRUpload = () => {
         }
       );
 
-      setSuccess('Document uploaded successfully! You will receive an OTP on your phone.');
+      setSuccess('Document uploaded successfully! You will receive an OTP on your email and phone.');
       setFile(null);
       setName('');
       setPhoneNumber('');
+      setEmail('');
       
       // Reset form
       e.target.reset();
@@ -158,6 +165,16 @@ const QRUpload = () => {
             onChange={(e) => setName(e.target.value)}
             margin="normal"
             required
+          />
+
+          <TextField
+            fullWidth
+            label="Email Address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            margin="normal"
+            required
+            type="email"
           />
 
           <TextField

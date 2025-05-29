@@ -21,7 +21,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await login(email, password);
+      await login({ email, password });
       navigate('/');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to login');

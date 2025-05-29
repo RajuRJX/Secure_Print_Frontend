@@ -86,10 +86,11 @@ const CyberCenterDashboard = () => {
 
   // Group documents by user
   const documentsByUser = documents.reduce((acc, doc) => {
-    if (!acc[doc.uploaded_by]) {
-      acc[doc.uploaded_by] = [];
+    const userName = doc.uploaded_by_name || 'Anonymous User';
+    if (!acc[userName]) {
+      acc[userName] = [];
     }
-    acc[doc.uploaded_by].push(doc);
+    acc[userName].push(doc);
     return acc;
   }, {});
 
@@ -136,12 +137,13 @@ const CyberCenterDashboard = () => {
         setOtp('');
         fetchDocuments();
 
-        // Open print service in new tab
+        // Open the document in a new tab
         window.open(response.data.printServiceUrl, '_blank');
       } else {
-        setError('No print service URL received');
+        setError('No signed URL received');
       }
     } catch (error) {
+      console.error('OTP verification error:', error);
       setError('Failed to verify OTP: ' + (error.response?.data?.message || error.message));
     }
   };
@@ -272,6 +274,10 @@ const CyberCenterDashboard = () => {
                             <br />
                             <Typography component="span" variant="body2" color="text.secondary">
                               Uploaded: {new Date(doc.created_at).toLocaleString()}
+                            </Typography>
+                            <br />
+                            <Typography component="span" variant="body2" color="text.secondary">
+                              Contact: {doc.uploaded_by_email}
                             </Typography>
                           </>
                         }

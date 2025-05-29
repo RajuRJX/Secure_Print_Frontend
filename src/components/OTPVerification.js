@@ -12,15 +12,21 @@ const OTPVerification = ({ documentId, onVerificationSuccess }) => {
     setLoading(true);
 
     try {
-      const response = await axios.post('/api/print/verify', {
+      console.log('Verifying OTP for document:', documentId, 'OTP:', otp);
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/print/verify`, {
         document_id: documentId,
         otp: otp
       });
 
-      if (response.data.signedUrl) {
-        onVerificationSuccess(response.data.signedUrl);
+      console.log('OTP verification response:', response.data);
+
+      if (response.data.printServiceUrl) {
+        onVerificationSuccess(response.data.printServiceUrl);
+      } else {
+        setError('Invalid response from server');
       }
     } catch (error) {
+      console.error('OTP verification error:', error);
       setError(error.response?.data?.message || 'Failed to verify OTP');
     } finally {
       setLoading(false);
