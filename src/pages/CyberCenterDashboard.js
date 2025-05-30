@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Container,
   Typography,
@@ -35,6 +35,7 @@ import PrintIcon from '@mui/icons-material/Print';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import EmailIcon from '@mui/icons-material/Email';
 import BadgeIcon from '@mui/icons-material/Badge';
+import CloseIcon from '@mui/icons-material/Close';
 
 const CyberCenterDashboard = () => {
   const { token, user } = useAuth();
@@ -48,6 +49,10 @@ const CyberCenterDashboard = () => {
   const [showOtpDialog, setShowOtpDialog] = useState(false);
   const [showQRCode, setShowQRCode] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState('');
+  const [showPrintFrame, setShowPrintFrame] = useState(false);
+  const [printUrl, setPrintUrl] = useState('');
+  const [isLoadingDocument, setIsLoadingDocument] = useState(false);
+  const printFrameRef = useRef(null);
 
   useEffect(() => {
     if (token) {
@@ -122,6 +127,7 @@ const CyberCenterDashboard = () => {
     try {
       setError('');
       setSuccess('');
+      setIsLoadingDocument(true);
 
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/api/print/verify`,
@@ -137,21 +143,38 @@ const CyberCenterDashboard = () => {
         }
       );
 
-      if (response.data.printServiceUrl) {
+      if (response.data.success) {
         setSuccess('OTP verified successfully');
         setShowOtpDialog(false);
         setSelectedDocument(null);
         setOtp('');
         fetchDocuments();
 
-        // Open the document in a new tab
-        window.open(response.data.printServiceUrl, '_blank');
+        // Create a blob URL with the document data
+        const documentResponse = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/print/document/${selectedDocument.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            },
+            responseType: 'blob'
+          }
+        );
+
+        const blob = new Blob([documentResponse.data], {
+          type: documentResponse.headers['content-type']
+        });
+        const blobUrl = URL.createObjectURL(blob);
+        setPrintUrl(blobUrl);
+        setShowPrintFrame(true);
       } else {
-        setError('No signed URL received');
+        setError('Invalid response from server');
       }
     } catch (error) {
       console.error('OTP verification error:', error);
       setError('Failed to verify OTP: ' + (error.response?.data?.message || error.message));
+    } finally {
+      setIsLoadingDocument(false);
     }
   };
 
@@ -161,6 +184,39 @@ const CyberCenterDashboard = () => {
     setOtp('');
     setError('');
     setSuccess('');
+  };
+
+  const handlePrintFrameLoad = () => {
+    if (showPrintFrame && printFrameRef.current) {
+      try {
+        setIsLoadingDocument(false);
+        setSuccess('Document loaded. Click the print button to print.');
+      } catch (error) {
+        console.error('Error loading document:', error);
+        setError('Failed to load document');
+      }
+    }
+  };
+
+  const handlePrintClick = () => {
+    if (printFrameRef.current) {
+      try {
+        const printFrame = printFrameRef.current;
+        printFrame.contentWindow.print();
+      } catch (error) {
+        console.error('Error printing document:', error);
+        setError('Failed to print document. Please try using the browser\'s print function (Ctrl+P)');
+      }
+    }
+  };
+
+  const handleClosePrintFrame = () => {
+    setShowPrintFrame(false);
+    if (printUrl) {
+      URL.revokeObjectURL(printUrl);
+    }
+    setPrintUrl('');
+    setIsLoadingDocument(false);
   };
 
   if (loading) {
@@ -423,6 +479,77 @@ const CyberCenterDashboard = () => {
             color="primary"
           >
             Verify & Print
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Print Frame Dialog */}
+      <Dialog
+        open={showPrintFrame}
+        onClose={handleClosePrintFrame}
+        maxWidth="lg"
+        fullWidth
+        PaperProps={{
+          sx: {
+            height: '90vh',
+            display: 'flex',
+            flexDirection: 'column'
+          }
+        }}
+      >
+        <DialogTitle>
+          Print Document
+          <IconButton
+            onClick={handleClosePrintFrame}
+            sx={{ position: 'absolute', right: 8, top: 8 }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ flex: 1, p: 0, position: 'relative' }}>
+          {isLoadingDocument && (
+            <Box
+              sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                zIndex: 1
+              }}
+            >
+              <CircularProgress />
+            </Box>
+          )}
+          <iframe
+            ref={printFrameRef}
+            src={printUrl}
+            style={{
+              width: '100%',
+              height: '100%',
+              border: 'none',
+              backgroundColor: '#f5f5f5'
+            }}
+            onLoad={handlePrintFrameLoad}
+            title="Print Document"
+          />
+        </DialogContent>
+        <DialogActions sx={{ p: 2 }}>
+          <Button onClick={handleClosePrintFrame} color="inherit">
+            Close
+          </Button>
+          <Button
+            onClick={handlePrintClick}
+            variant="contained"
+            color="primary"
+            startIcon={<PrintIcon />}
+            disabled={isLoadingDocument}
+          >
+            Print Document
           </Button>
         </DialogActions>
       </Dialog>

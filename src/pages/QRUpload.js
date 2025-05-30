@@ -159,12 +159,12 @@ const QRUpload = () => {
   }
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 4, mb: 6 }}>
-      <Stack spacing={4}>
+    <Container maxWidth="sm" sx={{ mt: { xs: 2, sm: 4 }, mb: { xs: 4, sm: 6 } }}>
+      <Stack spacing={{ xs: 2, sm: 4 }}>
         {/* Header Section */}
         <Box 
           sx={{ 
-            p: 4,
+            p: { xs: 2, sm: 4 },
             borderRadius: 2,
             background: 'linear-gradient(to right, #1e40af, #6b21a8)',
             color: 'white',
@@ -192,8 +192,8 @@ const QRUpload = () => {
 
         {/* Features Section */}
         <Card sx={{ backgroundColor: '#e8efff' }}>
-          <CardContent>
-            <Grid container spacing={3} justifyContent="center">
+          <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+            <Grid container spacing={{ xs: 2, sm: 3 }} justifyContent="center">
               <Grid item xs={12} sm={4}>
                 <Box sx={{ textAlign: 'center' }}>
                   <Security sx={{ fontSize: 40, color: '#1e40af', mb: 1 }} />
@@ -227,15 +227,15 @@ const QRUpload = () => {
 
         {/* Upload Form */}
         <Card sx={{ backgroundColor: '#e8efff' }}>
-          <CardContent sx={{ p: 4 }}>
+          <CardContent sx={{ p: { xs: 3, sm: 4 } }}>
             {error && (
-              <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError('')}>
+              <Alert severity="error" sx={{ mb: { xs: 2, sm: 3 } }} onClose={() => setError('')}>
                 {error}
               </Alert>
             )}
 
             {success && (
-              <Alert severity="success" sx={{ mb: 3 }} onClose={() => setSuccess('')}>
+              <Alert severity="success" sx={{ mb: { xs: 2, sm: 3 } }} onClose={() => setSuccess('')}>
                 {success}
               </Alert>
             )}
@@ -315,7 +315,7 @@ const QRUpload = () => {
                 }}
               />
 
-              <Box sx={{ mt: 3, mb: 2 }}>
+              <Box sx={{ mt: { xs: 2, sm: 3 }, mb: { xs: 1, sm: 2 } }}>
                 <input
                   accept=".pdf,.docx"
                   style={{ display: 'none' }}
@@ -344,8 +344,8 @@ const QRUpload = () => {
                 </label>
                 {file && (
                   <Box sx={{ 
-                    mt: 2, 
-                    p: 2, 
+                    mt: { xs: 1.5, sm: 2 }, 
+                    p: { xs: 1.5, sm: 2 }, 
                     borderRadius: 1,
                     backgroundColor: 'white',
                     border: '1px solid #e5e7eb',
@@ -368,7 +368,7 @@ const QRUpload = () => {
                 disabled={uploading || !file}
                 startIcon={<Upload />}
                 sx={{ 
-                  mt: 2,
+                  mt: { xs: 2, sm: 2 },
                   height: 56,
                   background: 'linear-gradient(to right, #1e40af, #6b21a8)',
                   '&:hover': {
@@ -388,7 +388,7 @@ const QRUpload = () => {
 
         {/* Instructions Section */}
         <Card sx={{ backgroundColor: '#e8efff' }}>
-          <CardContent sx={{ p: 4 }}>
+          <CardContent sx={{ p: { xs: 3, sm: 4 } }}>
             <Typography variant="h6" gutterBottom sx={{ color: '#1e40af', fontWeight: 600 }}>
               How it works
             </Typography>
