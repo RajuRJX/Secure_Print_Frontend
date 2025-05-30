@@ -22,12 +22,19 @@ import {
   CardContent,
   Grid,
   IconButton,
-  Tooltip
+  Tooltip,
+  Avatar
 } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
 import QRCode from 'react-qr-code';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import PersonIcon from '@mui/icons-material/Person';
+import DescriptionIcon from '@mui/icons-material/Description';
+import PrintIcon from '@mui/icons-material/Print';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import EmailIcon from '@mui/icons-material/Email';
+import BadgeIcon from '@mui/icons-material/Badge';
 
 const CyberCenterDashboard = () => {
   const { token, user } = useAuth();
@@ -165,77 +172,124 @@ const CyberCenterDashboard = () => {
   }
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4 }}>
-      <Typography variant="h4" gutterBottom>
+    <Container maxWidth="lg" sx={{ mt: 4, mb: 6 }}>
+      <Typography variant="h4" gutterBottom sx={{ mb: 4 }}>
         Cyber Center Dashboard
       </Typography>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>
+        <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError('')}>
           {error}
         </Alert>
       )}
 
       {success && (
-        <Alert severity="success" sx={{ mb: 2 }} onClose={() => setSuccess('')}>
+        <Alert severity="success" sx={{ mb: 3 }} onClose={() => setSuccess('')}>
           {success}
         </Alert>
       )}
 
-      <Grid container spacing={3}>
+      <Grid container spacing={4}>
         {/* QR Code Section */}
-        <Grid item xs={12} md={4}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Your QR Code
-              </Typography>
-              <Box sx={{ textAlign: 'center', mb: 2 }}>
-                {qrCodeUrl && (
-                  <>
-                    <QRCode
-                      value={qrCodeUrl}
-                      size={200}
-                      style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-                      viewBox={`0 0 200 200`}
-                    />
-                    <Box sx={{ mt: 2 }}>
-                      <Typography variant="body2" color="text.secondary" sx={{ wordBreak: 'break-all' }}>
-                        {qrCodeUrl}
-                      </Typography>
-                      <Tooltip title="Copy URL">
-                        <IconButton onClick={copyQRCodeUrl} size="small">
-                          <ContentCopyIcon />
-                        </IconButton>
-                      </Tooltip>
-                    </Box>
-                  </>
-                )}
+        <Grid item xs={12} md={showQRCode ? 4 : 12}>
+          <Card sx={{ height: '100%' }}>
+            <CardContent sx={{ p: 3 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                <Typography variant="h6">
+                  {showQRCode ? 'Your QR Code' : 'Quick Actions'}
+                </Typography>
+                <Button
+                  variant="contained"
+                  onClick={() => setShowQRCode(!showQRCode)}
+                  sx={{
+                    background: 'linear-gradient(to right, #1e40af, #6b21a8)',
+                    '&:hover': {
+                      background: 'linear-gradient(to right, #1e3a8a, #581c87)',
+                    },
+                  }}
+                >
+                  {showQRCode ? 'Hide QR' : 'Show QR'}
+                </Button>
               </Box>
+              <Collapse in={showQRCode}>
+                <Box sx={{ textAlign: 'center', mb: 2 }}>
+                  {qrCodeUrl && (
+                    <>
+                      <QRCode
+                        value={qrCodeUrl}
+                        size={200}
+                        style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                        viewBox={`0 0 200 200`}
+                      />
+                      <Box sx={{ mt: 3 }}>
+                        <Typography variant="body2" color="text.secondary" sx={{ wordBreak: 'break-all', mb: 1 }}>
+                          {qrCodeUrl}
+                        </Typography>
+                        <Tooltip title="Copy URL">
+                          <IconButton onClick={copyQRCodeUrl} size="small">
+                            <ContentCopyIcon />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+                    </>
+                  )}
+                </Box>
+              </Collapse>
             </CardContent>
           </Card>
         </Grid>
 
         {/* Users List Section */}
-        <Grid item xs={12} md={8}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Users with Documents
-              </Typography>
-              <List>
+        <Grid item xs={12} md={showQRCode ? 8 : 12}>
+          <Card sx={{ height: '100%' }}>
+            <CardContent sx={{ p: 3 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                <BadgeIcon sx={{ mr: 1, color: '#1e40af' }} />
+                <Typography variant="h6">
+                  Users with Documents
+                </Typography>
+              </Box>
+              <List sx={{ py: 0 }}>
                 {Object.entries(documentsByUser).map(([userName, userDocs]) => (
                   <React.Fragment key={userName}>
                     <ListItemButton 
                       onClick={() => handleUserSelect(userName)}
                       selected={selectedUser === userName}
+                      sx={{
+                        borderRadius: 1,
+                        mb: 1.5,
+                        py: 1.5,
+                        '&.Mui-selected': {
+                          backgroundColor: '#e8efff',
+                          '&:hover': {
+                            backgroundColor: '#e8efff',
+                          },
+                        },
+                        '&:hover': {
+                          backgroundColor: 'rgba(30, 64, 175, 0.08)',
+                        },
+                      }}
                     >
+                      <Avatar sx={{ bgcolor: '#1e40af', mr: 2 }}>
+                        <PersonIcon />
+                      </Avatar>
                       <ListItemText 
-                        primary={userName}
-                        secondary={`${userDocs.length} document(s)`}
+                        primary={
+                          <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
+                            {userName}
+                          </Typography>
+                        }
+                        secondary={
+                          <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
+                            <DescriptionIcon sx={{ fontSize: 16, mr: 0.5, color: '#6b7280' }} />
+                            <Typography variant="body2" color="text.secondary">
+                              {userDocs.length} document(s)
+                            </Typography>
+                          </Box>
+                        }
                       />
                     </ListItemButton>
-                    <Divider />
+                    <Divider sx={{ my: 1 }} />
                   </React.Fragment>
                 ))}
               </List>
@@ -247,47 +301,74 @@ const CyberCenterDashboard = () => {
         {selectedUser && (
           <Grid item xs={12}>
             <Card>
-              <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  {selectedUser}'s Documents
-                </Typography>
-                <List>
+              <CardContent sx={{ p: 3 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                  <DescriptionIcon sx={{ mr: 1, color: '#1e40af' }} />
+                  <Typography variant="h6">
+                    {selectedUser}'s Documents
+                  </Typography>
+                </Box>
+                <List sx={{ py: 0 }}>
                   {documentsByUser[selectedUser].map((doc) => (
                     <ListItem 
                       key={doc.id}
                       sx={{
-                        border: '1px solid #eee',
-                        borderRadius: 1,
-                        mb: 1,
+                        border: '1px solid #e5e7eb',
+                        borderRadius: 2,
+                        mb: 2,
+                        p: 2,
+                        backgroundColor: '#ffffff',
                         '&:hover': {
-                          backgroundColor: '#f5f5f5'
-                        }
+                          backgroundColor: '#f8fafc',
+                          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
+                        },
+                        transition: 'all 0.2s ease-in-out',
                       }}
                     >
                       <ListItemText
-                        primary={doc.file_name}
+                        primary={
+                          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
+                            <DescriptionIcon sx={{ mr: 1, color: '#1e40af' }} />
+                            <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
+                              {doc.file_name}
+                            </Typography>
+                          </Box>
+                        }
                         secondary={
-                          <>
-                            <Typography component="span" variant="body2" color="text.primary">
-                              Status: {doc.status}
-                            </Typography>
-                            <br />
-                            <Typography component="span" variant="body2" color="text.secondary">
-                              Uploaded: {new Date(doc.created_at).toLocaleString()}
-                            </Typography>
-                            <br />
-                            <Typography component="span" variant="body2" color="text.secondary">
-                              Contact: {doc.uploaded_by_email}
-                            </Typography>
-                          </>
+                          <Box sx={{ pl: 4 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                              <BadgeIcon sx={{ fontSize: 16, mr: 1, color: '#6b7280' }} />
+                              <Typography component="span" variant="body2" color="text.primary">
+                                Status: {doc.status}
+                              </Typography>
+                            </Box>
+                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                              <AccessTimeIcon sx={{ fontSize: 16, mr: 1, color: '#6b7280' }} />
+                              <Typography component="span" variant="body2" color="text.secondary">
+                                Uploaded: {new Date(doc.created_at).toLocaleString()}
+                              </Typography>
+                            </Box>
+                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                              <EmailIcon sx={{ fontSize: 16, mr: 1, color: '#6b7280' }} />
+                              <Typography component="span" variant="body2" color="text.secondary">
+                                Contact: {doc.uploaded_by_email}
+                              </Typography>
+                            </Box>
+                          </Box>
                         }
                       />
                       {doc.status === 'pending' && (
                         <Button
                           variant="contained"
-                          color="primary"
                           onClick={() => handlePrint(doc)}
                           size="small"
+                          startIcon={<PrintIcon />}
+                          sx={{
+                            background: 'linear-gradient(to right, #1e40af, #6b21a8)',
+                            '&:hover': {
+                              background: 'linear-gradient(to right, #1e3a8a, #581c87)',
+                            },
+                          }}
                         >
                           Print
                         </Button>
@@ -308,7 +389,11 @@ const CyberCenterDashboard = () => {
         maxWidth="sm"
         fullWidth
         PaperProps={{
-          sx: { minWidth: '400px', padding: '20px' }
+          sx: { 
+            minWidth: '400px',
+            p: 2,
+            borderRadius: 2
+          }
         }}
       >
         <DialogTitle>

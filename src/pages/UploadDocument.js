@@ -9,10 +9,23 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  CircularProgress
+  CircularProgress,
+  Paper,
+  Stack,
+  Divider,
+  useTheme,
+  alpha,
+  useMediaQuery,
+  Card,
+  CardContent,
+  Grid
 } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import SecurityIcon from '@mui/icons-material/Security';
+import DescriptionIcon from '@mui/icons-material/Description';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
 
 const UploadDocument = () => {
   const { user, token } = useAuth();
@@ -23,6 +36,8 @@ const UploadDocument = () => {
   const [selectedCenter, setSelectedCenter] = useState('');
   const [loading, setLoading] = useState(false);
   const [loadingCenters, setLoadingCenters] = useState(true);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   useEffect(() => {
     console.log('UploadDocument mounted, token:', token);
@@ -114,89 +129,221 @@ const UploadDocument = () => {
   }
 
   return (
-    <Container maxWidth="sm">
-      <Box sx={{ mt: 4 }}>
-        <Typography variant="h4" align="center" gutterBottom>
-          Upload Document
-        </Typography>
-
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>
-            {error}
-          </Alert>
-        )}
-
-        {success && (
-          <Alert severity="success" sx={{ mb: 2 }} onClose={() => setSuccess('')}>
-            {success}
-          </Alert>
-        )}
-
-        <Box component="form" onSubmit={handleSubmit}>
-          <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel>Select Cyber Center</InputLabel>
-            <Select
-              value={selectedCenter}
-              label="Select Cyber Center"
-              onChange={(e) => setSelectedCenter(e.target.value)}
-              required
-              disabled={loadingCenters}
-            >
-              {loadingCenters ? (
-                <MenuItem disabled>
-                  <CircularProgress size={20} sx={{ mr: 1 }} />
-                  Loading centers...
-                </MenuItem>
-              ) : cyberCenters.length === 0 ? (
-                <MenuItem disabled>No cyber centers available</MenuItem>
-              ) : (
-                cyberCenters.map((center) => (
-                  <MenuItem key={center.id} value={center.id}>
-                    {center.center_name} - {center.center_address}
-                  </MenuItem>
-                ))
-              )}
-            </Select>
-          </FormControl>
-
-          <Button
-            variant="contained"
-            component="label"
-            fullWidth
-            sx={{ mb: 2 }}
-            disabled={loading}
-          >
-            Choose File
-            <input
-              type="file"
-              hidden
-              onChange={handleFileChange}
-            />
-          </Button>
-
-          {file && (
-            <Typography variant="body2" sx={{ mb: 2 }}>
-              Selected file: {file.name}
-            </Typography>
-          )}
-
-          <Button
-            type="submit"
-            variant="contained"
-            fullWidth
-            disabled={!file || !selectedCenter || loading}
-          >
-            {loading ? (
-              <>
-                <CircularProgress size={20} sx={{ mr: 1 }} />
-                Uploading...
-              </>
-            ) : (
-              'Upload'
-            )}
-          </Button>
+    <Container maxWidth="md" sx={{ mt: 4, mb: 6 }}>
+      <Stack spacing={4}>
+        {/* Header Section */}
+        <Box 
+          sx={{ 
+            p: 4,
+            borderRadius: 2,
+            background: 'linear-gradient(to right, #1e40af, #6b21a8)',
+            color: 'white',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+            textAlign: 'center'
+          }}
+        >
+          <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
+            Secure Document Upload
+          </Typography>
+          <Typography variant="subtitle1" sx={{ opacity: 0.9 }}>
+            Upload your documents securely and print them at your chosen cyber center
+          </Typography>
         </Box>
-      </Box>
+
+        {/* Features Section */}
+        <Card sx={{ backgroundColor: '#e8efff' }}>
+          <CardContent>
+            <Grid container spacing={3} justifyContent="center">
+              <Grid item xs={12} sm={4}>
+                <Box sx={{ textAlign: 'center' }}>
+                  <SecurityIcon sx={{ fontSize: 40, color: '#1e40af', mb: 1 }} />
+                  <Typography variant="subtitle1" sx={{ color: '#1e40af', fontWeight: 500 }}>Secure Upload</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    End-to-end encryption
+                  </Typography>
+                </Box>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <Box sx={{ textAlign: 'center' }}>
+                  <DescriptionIcon sx={{ fontSize: 40, color: '#1e40af', mb: 1 }} />
+                  <Typography variant="subtitle1" sx={{ color: '#1e40af', fontWeight: 500 }}>Multiple Formats</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    PDF & DOCX support
+                  </Typography>
+                </Box>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <Box sx={{ textAlign: 'center' }}>
+                  <LocationOnIcon sx={{ fontSize: 40, color: '#1e40af', mb: 1 }} />
+                  <Typography variant="subtitle1" sx={{ color: '#1e40af', fontWeight: 500 }}>Cyber Centers</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Nationwide network
+                  </Typography>
+                </Box>
+              </Grid>
+            </Grid>
+          </CardContent>
+        </Card>
+
+        {/* Upload Form */}
+        <Card sx={{ backgroundColor: '#e8efff' }}>
+          <CardContent sx={{ p: 4 }}>
+            {error && (
+              <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError('')}>
+                {error}
+              </Alert>
+            )}
+
+            {success && (
+              <Alert severity="success" sx={{ mb: 3 }} onClose={() => setSuccess('')}>
+                {success}
+              </Alert>
+            )}
+
+            <Box component="form" onSubmit={handleSubmit}>
+              <FormControl fullWidth sx={{ mb: 3 }}>
+                <InputLabel>Select Cyber Center</InputLabel>
+                <Select
+                  value={selectedCenter}
+                  label="Select Cyber Center"
+                  onChange={(e) => setSelectedCenter(e.target.value)}
+                  required
+                  disabled={loadingCenters}
+                  MenuProps={{
+                    PaperProps: {
+                      sx: {
+                        maxHeight: 300,
+                        '& .MuiMenuItem-root': {
+                          whiteSpace: 'normal',
+                          minHeight: '48px',
+                          padding: '8px 16px',
+                        }
+                      }
+                    }
+                  }}
+                >
+                  {loadingCenters ? (
+                    <MenuItem disabled>
+                      <CircularProgress size={20} sx={{ mr: 1 }} />
+                      Loading centers...
+                    </MenuItem>
+                  ) : cyberCenters.length === 0 ? (
+                    <MenuItem disabled>No cyber centers available</MenuItem>
+                  ) : (
+                    cyberCenters.map((center) => (
+                      <MenuItem key={center.id} value={center.id}>
+                        <Box>
+                          <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                            {center.center_name}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {center.center_address}
+                          </Typography>
+                        </Box>
+                      </MenuItem>
+                    ))
+                  )}
+                </Select>
+              </FormControl>
+
+              <Button
+                variant="contained"
+                component="label"
+                fullWidth
+                sx={{ 
+                  mb: 3,
+                  background: 'linear-gradient(to right, #1e40af, #6b21a8)',
+                  '&:hover': {
+                    background: 'linear-gradient(to right, #1e3a8a, #581c87)',
+                  },
+                  height: 56,
+                }}
+                startIcon={<CloudUploadIcon />}
+                disabled={loading}
+              >
+                Choose File
+                <input
+                  type="file"
+                  hidden
+                  onChange={handleFileChange}
+                  accept=".pdf,.docx"
+                />
+              </Button>
+
+              {file && (
+                <Box sx={{ 
+                  mb: 3, 
+                  p: 2, 
+                  borderRadius: 1,
+                  backgroundColor: 'white',
+                  border: '1px solid #e5e7eb',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1
+                }}>
+                  <DescriptionIcon sx={{ color: '#1e40af' }} />
+                  <Typography variant="body2" sx={{ color: '#1e40af', fontWeight: 500 }}>
+                    {file.name}
+                  </Typography>
+                </Box>
+              )}
+
+              <Button
+                type="submit"
+                variant="contained"
+                fullWidth
+                disabled={!file || !selectedCenter || loading}
+                sx={{ 
+                  background: 'linear-gradient(to right, #1e40af, #6b21a8)',
+                  color: 'white !important',
+                  '&:hover': {
+                    background: 'linear-gradient(to right, #1e3a8a, #581c87)',
+                  },
+                  height: 56,
+                  '& .MuiButton-label': {
+                    color: 'white',
+                  }
+                }}
+              >
+                {loading ? (
+                  <>
+                    <CircularProgress size={20} sx={{ mr: 1, color: 'white' }} />
+                    <span style={{ color: 'white' }}>Uploading...</span>
+                  </>
+                ) : (
+                  <span style={{ color: 'white' }}>Upload Document</span>
+                )}
+              </Button>
+            </Box>
+          </CardContent>
+        </Card>
+
+        {/* Instructions Section */}
+        <Card sx={{ backgroundColor: '#e8efff' }}>
+          <CardContent sx={{ p: 4 }}>
+            <Typography variant="h6" gutterBottom sx={{ color: '#1e40af', fontWeight: 600 }}>
+              How it works
+            </Typography>
+            <Stack spacing={2}>
+              <Typography variant="body2" color="text.secondary">
+                1. Select a cyber center from the dropdown menu
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                2. Choose your document (PDF or DOCX format)
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                3. Upload your document securely
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                4. Receive an OTP via email and SMS
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                5. Visit the cyber center with your OTP to print your document
+              </Typography>
+            </Stack>
+          </CardContent>
+        </Card>
+      </Stack>
     </Container>
   );
 };

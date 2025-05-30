@@ -9,15 +9,32 @@ import {
   Container,
   IconButton,
   Menu,
-  MenuItem
+  MenuItem,
+  useTheme,
+  useMediaQuery,
+  Drawer,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Divider
 } from '@mui/material';
-import { AccountCircle } from '@mui/icons-material';
+import { 
+  AccountCircle, 
+  Dashboard as DashboardIcon,
+  Upload as UploadIcon,
+  Print as PrintIcon,
+  Menu as MenuIcon
+} from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 
 const Layout = ({ children }) => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
@@ -33,22 +50,112 @@ const Layout = ({ children }) => {
     navigate('/login');
   };
 
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
+
+  const menuItems = user ? [
+    { text: 'Dashboard', icon: <DashboardIcon />, onClick: () => navigate('/') },
+    ...(user.is_cyber_center 
+      ? [{ text: 'Print Documents', icon: <PrintIcon />, onClick: () => navigate('/print') }]
+      : [{ text: 'Upload Document', icon: <UploadIcon />, onClick: () => navigate('/upload') }]
+    )
+  ] : [];
+
+  const drawer = (
+    <Box sx={{ width: 250 }}>
+      <Toolbar>
+        <Typography variant="h6" noWrap component="div">
+          Secure Print
+        </Typography>
+      </Toolbar>
+      <Divider />
+      <List>
+        {menuItems.map((item) => (
+          <ListItem 
+            button 
+            key={item.text} 
+            onClick={() => {
+              item.onClick();
+              setMobileOpen(false);
+            }}
+            sx={{
+              '&:hover': {
+                backgroundColor: 'rgba(59, 130, 246, 0.08)',
+              },
+            }}
+          >
+            <ListItemIcon>{item.icon}</ListItemIcon>
+            <ListItemText primary={item.text} />
+          </ListItem>
+        ))}
+      </List>
+    </Box>
+  );
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <AppBar position="static">
+      <AppBar 
+        position="static" 
+        elevation={0}
+        sx={{
+          background: 'linear-gradient(to right, #1e40af, #6b21a8)',
+          color: 'white',
+          borderBottom: 'none',
+        }}
+      >
         <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          {isMobile && (
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              edge="start"
+              onClick={handleDrawerToggle}
+              sx={{ mr: 2 }}
+            >
+              <MenuIcon />
+            </IconButton>
+          )}
+          <Typography 
+            variant="h6" 
+            component="div" 
+            sx={{ 
+              flexGrow: 1,
+              fontWeight: 600,
+              color: 'white',
+            }}
+          >
             Secure Document Printing
           </Typography>
-          {user && (
+          {user && !isMobile && (
             <>
               {!user.is_cyber_center && (
-                <Button color="inherit" onClick={() => navigate('/upload')}>
+                <Button 
+                  color="inherit" 
+                  onClick={() => navigate('/upload')}
+                  startIcon={<UploadIcon />}
+                  sx={{ 
+                    mr: 2,
+                    '&:hover': {
+                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    },
+                  }}
+                >
                   Upload Document
                 </Button>
               )}
               {user.is_cyber_center && (
-                <Button color="inherit" onClick={() => navigate('/print')}>
+                <Button 
+                  color="inherit" 
+                  onClick={() => navigate('/print')}
+                  startIcon={<PrintIcon />}
+                  sx={{ 
+                    mr: 2,
+                    '&:hover': {
+                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    },
+                  }}
+                >
                   Print Documents
                 </Button>
               )}
@@ -58,7 +165,12 @@ const Layout = ({ children }) => {
                 aria-controls="menu-appbar"
                 aria-haspopup="true"
                 onClick={handleMenu}
-                color="inherit"
+                sx={{
+                  color: 'white',
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  },
+                }}
               >
                 <AccountCircle />
               </IconButton>
@@ -66,7 +178,7 @@ const Layout = ({ children }) => {
                 id="menu-appbar"
                 anchorEl={anchorEl}
                 anchorOrigin={{
-                  vertical: 'top',
+                  vertical: 'bottom',
                   horizontal: 'right',
                 }}
                 keepMounted
@@ -76,36 +188,93 @@ const Layout = ({ children }) => {
                 }}
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
+                PaperProps={{
+                  elevation: 2,
+                  sx: {
+                    mt: 1.5,
+                    backgroundColor: '#e8efff',
+                    '& .MuiMenuItem-root': {
+                      px: 2,
+                      py: 1.5,
+                      '&:hover': {
+                        backgroundColor: 'rgba(59, 130, 246, 0.08)',
+                      },
+                    },
+                  },
+                }}
               >
                 <MenuItem onClick={() => {
                   handleClose();
                   navigate('/');
                 }}>
-                  Dashboard
+                  <ListItemIcon>
+                    <DashboardIcon fontSize="small" sx={{ color: '#1e40af' }} />
+                  </ListItemIcon>
+                  <ListItemText primary="Dashboard" />
                 </MenuItem>
-                <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                <MenuItem onClick={handleLogout}>
+                  <ListItemIcon>
+                    <AccountCircle fontSize="small" sx={{ color: '#1e40af' }} />
+                  </ListItemIcon>
+                  <ListItemText primary="Logout" />
+                </MenuItem>
               </Menu>
             </>
           )}
         </Toolbar>
       </AppBar>
-      <Container component="main" sx={{ mt: 4, mb: 4, flex: 1 }}>
+
+      <Drawer
+        variant="temporary"
+        anchor="left"
+        open={mobileOpen}
+        onClose={handleDrawerToggle}
+        ModalProps={{
+          keepMounted: true,
+        }}
+        sx={{
+          display: { xs: 'block', sm: 'none' },
+          '& .MuiDrawer-paper': { 
+            boxSizing: 'border-box', 
+            width: 250,
+            backgroundColor: '#e8efff',
+          },
+        }}
+      >
+        {drawer}
+      </Drawer>
+
+      <Container 
+        component="main" 
+        sx={{ 
+          mt: 4, 
+          mb: 4, 
+          flex: 1,
+          px: { xs: 2, sm: 3 },
+          maxWidth: { sm: 'lg', md: 'xl' },
+        }}
+      >
         {children}
       </Container>
+
       <Box
         component="footer"
         sx={{
           py: 3,
           px: 2,
           mt: 'auto',
-          backgroundColor: (theme) =>
-            theme.palette.mode === 'light'
-              ? theme.palette.grey[200]
-              : theme.palette.grey[800],
+          backgroundColor: '#e8efff',
+          borderTop: '1px solid',
+          borderColor: 'rgba(30, 64, 175, 0.2)',
         }}
       >
         <Container maxWidth="sm">
-          <Typography variant="body2" color="text.secondary" align="center">
+          <Typography 
+            variant="body2" 
+            color="text.secondary" 
+            align="center"
+            sx={{ fontWeight: 500 }}
+          >
             © {new Date().getFullYear()} Secure Document Printing System
           </Typography>
         </Container>

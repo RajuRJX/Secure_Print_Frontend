@@ -10,9 +10,26 @@ import {
   Alert,
   TextField,
   InputAdornment,
-  IconButton
+  IconButton,
+  Card,
+  CardContent,
+  Stack,
+  Divider,
+  useTheme,
+  useMediaQuery,
+  Grid
 } from '@mui/material';
-import { PhotoCamera, Upload } from '@mui/icons-material';
+import { 
+  PhotoCamera, 
+  Upload, 
+  LocationOn, 
+  Person, 
+  Email, 
+  Phone, 
+  Description,
+  Security,
+  CloudUpload
+} from '@mui/icons-material';
 import axios from 'axios';
 
 const QRUpload = () => {
@@ -27,6 +44,8 @@ const QRUpload = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   useEffect(() => {
     if (!centerId) {
@@ -140,108 +159,256 @@ const QRUpload = () => {
   }
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 4, mb: 4 }}>
-      <Paper elevation={3} sx={{ p: 3 }}>
-        <Typography variant="h5" gutterBottom align="center">
-          Upload Document
-        </Typography>
-        
-        {centerInfo && (
-          <Box sx={{ mb: 3, textAlign: 'center' }}>
-            <Typography variant="h6" color="primary">
-              {centerInfo.centerName}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {centerInfo.centerAddress}
-            </Typography>
-          </Box>
-        )}
-
-        <form onSubmit={handleSubmit}>
-          <TextField
-            fullWidth
-            label="Your Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            margin="normal"
-            required
-          />
-
-          <TextField
-            fullWidth
-            label="Email Address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            margin="normal"
-            required
-            type="email"
-          />
-
-          <TextField
-            fullWidth
-            label="Phone Number"
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-            margin="normal"
-            required
-            type="tel"
-          />
-
-          <Box sx={{ mt: 2, mb: 2 }}>
-            <input
-              accept=".pdf,.docx"
-              style={{ display: 'none' }}
-              id="file-input"
-              type="file"
-              onChange={handleFileChange}
-            />
-            <label htmlFor="file-input">
-              <Button
-                variant="outlined"
-                component="span"
-                fullWidth
-                startIcon={<PhotoCamera />}
-              >
-                Select Document
-              </Button>
-            </label>
-            {file && (
-              <Typography variant="body2" sx={{ mt: 1 }}>
-                Selected: {file.name}
+    <Container maxWidth="sm" sx={{ mt: 4, mb: 6 }}>
+      <Stack spacing={4}>
+        {/* Header Section */}
+        <Box 
+          sx={{ 
+            p: 4,
+            borderRadius: 2,
+            background: 'linear-gradient(to right, #1e40af, #6b21a8)',
+            color: 'white',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+            textAlign: 'center'
+          }}
+        >
+          <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
+            Secure Document Upload
+          </Typography>
+          {centerInfo && (
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="h6" sx={{ fontWeight: 500 }}>
+                {centerInfo.centerName}
               </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mt: 1 }}>
+                <LocationOn sx={{ mr: 0.5, fontSize: 20 }} />
+                <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                  {centerInfo.centerAddress}
+                </Typography>
+              </Box>
+            </Box>
+          )}
+        </Box>
+
+        {/* Features Section */}
+        <Card sx={{ backgroundColor: '#e8efff' }}>
+          <CardContent>
+            <Grid container spacing={3} justifyContent="center">
+              <Grid item xs={12} sm={4}>
+                <Box sx={{ textAlign: 'center' }}>
+                  <Security sx={{ fontSize: 40, color: '#1e40af', mb: 1 }} />
+                  <Typography variant="subtitle1" sx={{ color: '#1e40af', fontWeight: 500 }}>Secure Upload</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    End-to-end encryption
+                  </Typography>
+                </Box>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <Box sx={{ textAlign: 'center' }}>
+                  <Description sx={{ fontSize: 40, color: '#1e40af', mb: 1 }} />
+                  <Typography variant="subtitle1" sx={{ color: '#1e40af', fontWeight: 500 }}>Multiple Formats</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    PDF & DOCX support
+                  </Typography>
+                </Box>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <Box sx={{ textAlign: 'center' }}>
+                  <CloudUpload sx={{ fontSize: 40, color: '#1e40af', mb: 1 }} />
+                  <Typography variant="subtitle1" sx={{ color: '#1e40af', fontWeight: 500 }}>Quick Process</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Instant OTP delivery
+                  </Typography>
+                </Box>
+              </Grid>
+            </Grid>
+          </CardContent>
+        </Card>
+
+        {/* Upload Form */}
+        <Card sx={{ backgroundColor: '#e8efff' }}>
+          <CardContent sx={{ p: 4 }}>
+            {error && (
+              <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError('')}>
+                {error}
+              </Alert>
             )}
-          </Box>
 
-          <Button
-            type="submit"
-            variant="contained"
-            fullWidth
-            disabled={uploading || !file}
-            startIcon={<Upload />}
-            sx={{ mt: 2 }}
-          >
-            {uploading ? 'Uploading...' : 'Upload Document'}
-          </Button>
-        </form>
+            {success && (
+              <Alert severity="success" sx={{ mb: 3 }} onClose={() => setSuccess('')}>
+                {success}
+              </Alert>
+            )}
 
-        {error && (
-          <Alert severity="error" sx={{ mt: 2 }}>
-            {error}
-          </Alert>
-        )}
+            <Box component="form" onSubmit={handleSubmit}>
+              <TextField
+                fullWidth
+                label="Your Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                margin="normal"
+                required
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Person sx={{ color: '#1e40af' }} />
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: 'white',
+                    '&:hover fieldset': {
+                      borderColor: '#1e40af',
+                    },
+                  },
+                }}
+              />
 
-        {success && (
-          <Alert severity="success" sx={{ mt: 2 }}>
-            {success}
-          </Alert>
-        )}
+              <TextField
+                fullWidth
+                label="Email Address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                margin="normal"
+                required
+                type="email"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Email sx={{ color: '#1e40af' }} />
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: 'white',
+                    '&:hover fieldset': {
+                      borderColor: '#1e40af',
+                    },
+                  },
+                }}
+              />
 
-        {uploading && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-            <CircularProgress size={24} />
-          </Box>
-        )}
-      </Paper>
+              <TextField
+                fullWidth
+                label="Phone Number"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                margin="normal"
+                required
+                type="tel"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Phone sx={{ color: '#1e40af' }} />
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: 'white',
+                    '&:hover fieldset': {
+                      borderColor: '#1e40af',
+                    },
+                  },
+                }}
+              />
+
+              <Box sx={{ mt: 3, mb: 2 }}>
+                <input
+                  accept=".pdf,.docx"
+                  style={{ display: 'none' }}
+                  id="file-input"
+                  type="file"
+                  onChange={handleFileChange}
+                />
+                <label htmlFor="file-input">
+                  <Button
+                    variant="outlined"
+                    component="span"
+                    fullWidth
+                    startIcon={<PhotoCamera />}
+                    sx={{
+                      height: 56,
+                      borderColor: '#1e40af',
+                      color: '#1e40af',
+                      '&:hover': {
+                        borderColor: '#1e3a8a',
+                        backgroundColor: 'rgba(30, 64, 175, 0.04)',
+                      },
+                    }}
+                  >
+                    Select Document
+                  </Button>
+                </label>
+                {file && (
+                  <Box sx={{ 
+                    mt: 2, 
+                    p: 2, 
+                    borderRadius: 1,
+                    backgroundColor: 'white',
+                    border: '1px solid #e5e7eb',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1
+                  }}>
+                    <Description sx={{ color: '#1e40af' }} />
+                    <Typography variant="body2" sx={{ color: '#1e40af', fontWeight: 500 }}>
+                      {file.name}
+                    </Typography>
+                  </Box>
+                )}
+              </Box>
+
+              <Button
+                type="submit"
+                variant="contained"
+                fullWidth
+                disabled={uploading || !file}
+                startIcon={<Upload />}
+                sx={{ 
+                  mt: 2,
+                  height: 56,
+                  background: 'linear-gradient(to right, #1e40af, #6b21a8)',
+                  '&:hover': {
+                    background: 'linear-gradient(to right, #1e3a8a, #581c87)',
+                  },
+                  '&.Mui-disabled': {
+                    background: 'rgba(0, 0, 0, 0.12)',
+                    color: 'rgba(255, 255, 255, 0.3)',
+                  },
+                }}
+              >
+                {uploading ? 'Uploading...' : 'Upload Document'}
+              </Button>
+            </Box>
+          </CardContent>
+        </Card>
+
+        {/* Instructions Section */}
+        <Card sx={{ backgroundColor: '#e8efff' }}>
+          <CardContent sx={{ p: 4 }}>
+            <Typography variant="h6" gutterBottom sx={{ color: '#1e40af', fontWeight: 600 }}>
+              How it works
+            </Typography>
+            <Stack spacing={2}>
+              <Typography variant="body2" color="text.secondary">
+                1. Fill in your details and select your document
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                2. Upload your document securely
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                3. Receive an OTP via email and SMS
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                4. Visit the cyber center with your OTP to print your document
+              </Typography>
+            </Stack>
+          </CardContent>
+        </Card>
+      </Stack>
     </Container>
   );
 };
