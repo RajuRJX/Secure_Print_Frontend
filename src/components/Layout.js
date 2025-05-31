@@ -1,9 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  AppBar, 
-  Box, 
-  Toolbar, 
+import {
+  AppBar,
+  Box,
+  Toolbar,
   Typography,
   Button,
   Container,
@@ -19,13 +19,12 @@ import {
   ListItemText,
   Divider
 } from '@mui/material';
-import { 
-  AccountCircle, 
+import {
+  AccountCircle,
   Dashboard as DashboardIcon,
   Upload as UploadIcon,
   Print as PrintIcon,
-  Menu as MenuIcon,
-  Security as SecurityIcon
+  Menu as MenuIcon
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -57,7 +56,7 @@ const Layout = ({ children }) => {
 
   const menuItems = user ? [
     { text: 'Dashboard', icon: <DashboardIcon />, onClick: () => navigate('/') },
-    ...(user.is_cyber_center 
+    ...(user.is_cyber_center
       ? [{ text: 'Print Documents', icon: <PrintIcon />, onClick: () => navigate('/print') }]
       : [{ text: 'Upload Document', icon: <UploadIcon />, onClick: () => navigate('/upload') }]
     )
@@ -73,9 +72,9 @@ const Layout = ({ children }) => {
       <Divider />
       <List>
         {menuItems.map((item) => (
-          <ListItem 
-            button 
-            key={item.text} 
+          <ListItem
+            button
+            key={item.text}
             onClick={() => {
               item.onClick();
               setMobileOpen(false);
@@ -96,8 +95,8 @@ const Layout = ({ children }) => {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <AppBar 
-        position="fixed" 
+      <AppBar
+        position="fixed"
         elevation={0}
         sx={{
           background: 'linear-gradient(to right, #1e40af, #6b21a8)',
@@ -118,26 +117,31 @@ const Layout = ({ children }) => {
               <MenuIcon />
             </IconButton>
           )}
-          <Box 
-            sx={{ 
-              display: 'flex', 
+          <Box
+            sx={{
+              display: 'flex',
               alignItems: 'center',
               flexGrow: 1,
               cursor: 'pointer'
             }}
             onClick={() => navigate('/')}
           >
-            <SecurityIcon 
-              sx={{ 
-                fontSize: { xs: 28, sm: 32 },
-                mr: 1.5,
-                color: 'white'
-              }} 
+            <Box
+              component="img"
+              src="/logo.png"
+              alt="SafeXribe Logo"
+              sx={{
+                height: 50,
+                width: 'auto',
+                mr: 1.2,
+                display: 'inline-block',
+                verticalAlign: 'middle',
+              }}
             />
-            <Typography 
-              variant="h5" 
-              component="div" 
-              sx={{ 
+            <Typography
+              variant="h5"
+              component="div"
+              sx={{
                 fontWeight: 700,
                 color: 'white',
                 letterSpacing: '0.5px',
@@ -157,11 +161,11 @@ const Layout = ({ children }) => {
           {user && !isMobile && (
             <>
               {!user.is_cyber_center && (
-                <Button 
-                  color="inherit" 
+                <Button
+                  color="inherit"
                   onClick={() => navigate('/upload')}
                   startIcon={<UploadIcon />}
-                  sx={{ 
+                  sx={{
                     mr: 2,
                     '&:hover': {
                       backgroundColor: 'rgba(255, 255, 255, 0.1)',
@@ -172,11 +176,11 @@ const Layout = ({ children }) => {
                 </Button>
               )}
               {user.is_cyber_center && (
-                <Button 
-                  color="inherit" 
+                <Button
+                  color="inherit"
                   onClick={() => navigate('/print')}
                   startIcon={<PrintIcon />}
-                  sx={{ 
+                  sx={{
                     mr: 2,
                     '&:hover': {
                       backgroundColor: 'rgba(255, 255, 255, 0.1)',
@@ -263,8 +267,8 @@ const Layout = ({ children }) => {
         }}
         sx={{
           display: { xs: 'block', sm: 'none' },
-          '& .MuiDrawer-paper': { 
-            boxSizing: 'border-box', 
+          '& .MuiDrawer-paper': {
+            boxSizing: 'border-box',
             width: 250,
             backgroundColor: '#e8efff',
             mt: '64px'
@@ -274,11 +278,11 @@ const Layout = ({ children }) => {
         {drawer}
       </Drawer>
 
-      <Container 
-        component="main" 
-        sx={{ 
-          mt: 4, 
-          mb: 4, 
+      <Container
+        component="main"
+        sx={{
+          mt: 4,
+          mb: 4,
           flex: 1,
           px: { xs: 2, sm: 3 },
           maxWidth: { sm: 'lg', md: 'xl' },
@@ -299,9 +303,9 @@ const Layout = ({ children }) => {
         }}
       >
         <Container maxWidth="sm">
-          <Typography 
-            variant="body2" 
-            color="text.secondary" 
+          <Typography
+            variant="body2"
+            color="text.secondary"
             align="center"
             sx={{ fontWeight: 500 }}
           >
@@ -313,4 +317,4 @@ const Layout = ({ children }) => {
   );
 };
 
-export default Layout; 
+export default Layout;
