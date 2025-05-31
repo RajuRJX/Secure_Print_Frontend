@@ -24,7 +24,8 @@ import {
   Dashboard as DashboardIcon,
   Upload as UploadIcon,
   Print as PrintIcon,
-  Menu as MenuIcon
+  Menu as MenuIcon,
+  Security as SecurityIcon
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -105,7 +106,7 @@ const Layout = ({ children }) => {
           zIndex: (theme) => theme.zIndex.drawer + 1
         }}
       >
-        <Toolbar>
+        <Toolbar sx={{ minHeight: { xs: '64px', sm: '70px' } }}>
           {isMobile && (
             <IconButton
               color="inherit"
@@ -117,17 +118,42 @@ const Layout = ({ children }) => {
               <MenuIcon />
             </IconButton>
           )}
-          <Typography 
-            variant="h6" 
-            component="div" 
+          <Box 
             sx={{ 
+              display: 'flex', 
+              alignItems: 'center',
               flexGrow: 1,
-              fontWeight: 600,
-              color: 'white',
+              cursor: 'pointer'
             }}
+            onClick={() => navigate('/')}
           >
-            SafeXribe
-          </Typography>
+            <SecurityIcon 
+              sx={{ 
+                fontSize: { xs: 28, sm: 32 },
+                mr: 1.5,
+                color: 'white'
+              }} 
+            />
+            <Typography 
+              variant="h5" 
+              component="div" 
+              sx={{ 
+                fontWeight: 700,
+                color: 'white',
+                letterSpacing: '0.5px',
+                display: 'flex',
+                alignItems: 'center',
+                '& span': {
+                  background: 'linear-gradient(to right, #ffffff, #e2e8f0)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  fontWeight: 800
+                }
+              }}
+            >
+              Safe<span>Xribe</span>
+            </Typography>
+          </Box>
           {user && !isMobile && (
             <>
               {!user.is_cyber_center && (
@@ -225,7 +251,7 @@ const Layout = ({ children }) => {
         </Toolbar>
       </AppBar>
 
-      <Toolbar />
+      <Toolbar sx={{ minHeight: { xs: '64px', sm: '70px' } }} />
 
       <Drawer
         variant="temporary"
