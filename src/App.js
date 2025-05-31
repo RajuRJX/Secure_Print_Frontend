@@ -111,7 +111,16 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/upload/:centerId" element={<QRUpload />} />
-            <Route path="/upload" element={<UploadDocument />} />
+            <Route
+              path="/upload"
+              element={
+                <PrivateRoute>
+                  <Layout>
+                    <UploadDocument />
+                  </Layout>
+                </PrivateRoute>
+              }
+            />
             <Route
               path="/"
               element={

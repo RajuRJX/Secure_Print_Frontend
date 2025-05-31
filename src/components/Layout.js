@@ -96,12 +96,13 @@ const Layout = ({ children }) => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <AppBar 
-        position="static" 
+        position="fixed" 
         elevation={0}
         sx={{
           background: 'linear-gradient(to right, #1e40af, #6b21a8)',
           color: 'white',
           borderBottom: 'none',
+          zIndex: (theme) => theme.zIndex.drawer + 1
         }}
       >
         <Toolbar>
@@ -125,7 +126,7 @@ const Layout = ({ children }) => {
               color: 'white',
             }}
           >
-            Secure Document Printing
+            SafeXribe
           </Typography>
           {user && !isMobile && (
             <>
@@ -224,6 +225,8 @@ const Layout = ({ children }) => {
         </Toolbar>
       </AppBar>
 
+      <Toolbar />
+
       <Drawer
         variant="temporary"
         anchor="left"
@@ -238,6 +241,7 @@ const Layout = ({ children }) => {
             boxSizing: 'border-box', 
             width: 250,
             backgroundColor: '#e8efff',
+            mt: '64px'
           },
         }}
       >
@@ -275,7 +279,7 @@ const Layout = ({ children }) => {
             align="center"
             sx={{ fontWeight: 500 }}
           >
-            © {new Date().getFullYear()} Secure Document Printing System
+            © {new Date().getFullYear()} SafeXribe
           </Typography>
         </Container>
       </Box>

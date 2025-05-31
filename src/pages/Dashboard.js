@@ -45,12 +45,14 @@ const Dashboard = () => {
           boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
         }}
       >
-        <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
+         <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
           {getWelcomeMessage()}, {user?.name}!
+          </Typography>
+        <Typography variant="h4" gutterBottom>
+          Welcome to your SafeXribe Dashboard
         </Typography>
-        <Typography variant="subtitle1" sx={{ opacity: 0.9 }}>
-          Welcome to your Secure Document Printing Dashboard
-        </Typography>
+      
+
       </Box>
 
       {/* Quick Actions */}
